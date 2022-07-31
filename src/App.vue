@@ -1,5 +1,9 @@
 <template>
-  <router-view :isLoggedIn="isLoggedIn" :signOut="signOut" :logIn="logIn" />
+  <div
+    class="min-h-screen bg-gradient-to-r from-light-blue to-light-purple py-5 sm:pt-10 sm:pb-3"
+  >
+    <router-view :isLoggedIn="isLoggedIn" :signOut="signOut" :logIn="logIn" />
+  </div>
 </template>
 
 <script>
@@ -50,7 +54,6 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 </style>

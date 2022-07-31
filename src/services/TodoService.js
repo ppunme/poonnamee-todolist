@@ -4,7 +4,6 @@ import authHeader from "./AuthHeader";
 export default {
   //Attached Token into the header and send a request for user content
   postTodo(todo) {
-    console.log(todo);
     return Api().post("todos", todo, { headers: authHeader() });
   },
   updateTodo(id, todo) {

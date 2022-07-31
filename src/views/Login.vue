@@ -1,9 +1,9 @@
 <template>
-  <div class="w-96 mt-8 mx-auto p-8">
-    <p class="text-2xl font-bold">Login</p>
+  <div class="w-80 sm:w-96 mx-auto pt-10">
+    <p class="text-center text-2xl font-bold">Login</p>
     <form @submit="loginHandle" class="mt-3">
       <div class="grid grid-cols-1 gap-6">
-        <label class="block text-start">
+        <label class="block">
           <span class="text-gray-700 font-semibold">Username</span>
           <input
             v-model="email"
@@ -14,14 +14,17 @@
                 'border-red-300 ring ring-red-200 ring-opacity-50',
             ]"
           />
-          <p v-if="!validEmail" class="text-sm text-red-500 font-semibold">
+          <p v-if="!validEmail" class="text-sm text-red-500 font-semibold pt-1">
             * Required field
           </p>
-          <p v-if="!validEmailForm" class="text-sm text-red-500 font-semibold">
+          <p
+            v-if="!validEmailForm"
+            class="text-sm text-red-500 font-semibold pt-1"
+          >
             * Invalid email address
           </p>
         </label>
-        <label class="block text-start">
+        <label class="block">
           <span class="text-gray-700 font-semibold">Password</span>
           <input
             type="password"
@@ -32,24 +35,39 @@
               'border-red-300 ring ring-red-200 ring-opacity-50'
             "
           />
-          <p v-if="!validPassword" class="text-sm text-red-500 font-semibold">
+          <p
+            v-if="!validPassword"
+            class="text-sm text-red-500 font-semibold pt-1"
+          >
             * Required field
           </p>
         </label>
       </div>
-      <button type="submit" class="w-full btn btn-create mt-5">Login</button>
-      <div
-        v-html="error"
-        class="mt-3 text-red-500 text-start font-semibold"
-      ></div>
+      <button type="submit" class="w-full h-12 btn btn-create mt-5">
+        <div v-if="isLoading">
+          <BeatLoader color="#ffffff" />
+        </div>
+        <div v-if="!isLoading">Login</div>
+      </button>
+      <div v-if="error">
+        <div
+          v-html="error"
+          class="mt-3 text-sm text-red-700 bg-red-200 rounded-lg p-3"
+        ></div>
+      </div>
     </form>
   </div>
 </template>
 
 <script>
 import AuthenticationService from "@/services/AuthenticationService";
+import BeatLoader from "vue-spinner/src/BeatLoader.vue";
+
 export default {
   name: "login-comp",
+  components: {
+    BeatLoader,
+  },
   props: {
     logIn: Function,
   },
@@ -62,6 +80,7 @@ export default {
       validEmailForm: true,
       validPassword: true,
       validCredential: true,
+      isLoading: null,
     };
   },
   methods: {
@@ -70,6 +89,7 @@ export default {
         const result = this.validateForm(this.email, this.password);
 
         if (result === "success") {
+          this.isLoading = true;
           const response = await AuthenticationService.login({
             username: this.email,
             password: this.password,
@@ -78,12 +98,14 @@ export default {
           if (response.status === 200) {
             if (response.data.token) {
               localStorage.setItem("token", JSON.stringify(response.data));
+              this.isLoading = false;
             }
             this.logIn();
             setTimeout(() => this.$router.push({ name: "todolist" }), 700);
           }
         }
       } catch (error) {
+        this.isLoading = false;
         // saving the response to the data property of this component
         this.error = error.response.data.message;
       }
@@ -110,7 +132,6 @@ export default {
         this.validPassword = false;
         return;
       }
-
       return "success";
     },
   },

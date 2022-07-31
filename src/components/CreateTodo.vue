@@ -8,7 +8,21 @@
             <div class="grid grid-cols-1 gap-6">
               <label class="block">
                 <span class="text-gray-700 font-semibold">Title</span>
-                <input type="text" class="form-input" v-model="todo.title" />
+                <input
+                  type="text"
+                  class="form-input relative"
+                  :class="
+                    validTitle === false &&
+                    'border-red-300 ring ring-red-200 ring-opacity-50'
+                  "
+                  v-model="todo.title"
+                />
+                <p
+                  v-if="validTitle === false"
+                  class="absolute text-sm text-red-500 font-semibold pt-1"
+                >
+                  * Required field
+                </p>
               </label>
               <label class="block">
                 <span class="text-gray-700 font-semibold">Description</span>
@@ -21,11 +35,7 @@
             </div>
 
             <div class="flex justify-between mt-3">
-              <button
-                type="button"
-                class="btn btn-cancel"
-                @click="$emit('close')"
-              >
+              <button type="button" class="btn btn-cancel" @click="cancel">
                 Cancel
               </button>
               <button type="submit" class="btn btn-create">Create</button>
@@ -55,13 +65,19 @@ export default {
         title: "",
         description: "",
       },
+      validTitle: null,
     };
   },
   methods: {
     async create() {
       //Post data
       try {
-        console.log(this.todo);
+        //input validation
+        if (this.todo.title === "") {
+          this.validTitle = false;
+          return;
+        }
+
         const response = await TodoService.postTodo(this.todo);
         if (response.status == 200) {
           alert("Your todo is added!");
@@ -73,32 +89,24 @@ export default {
         console.log(error);
       }
     },
+    cancel() {
+      this.clearForm();
+      this.$emit("close");
+    },
     clearForm() {
       this.todo.title = "";
       this.todo.description = "";
+    },
+  },
+  watch: {
+    "todo.title"() {
+      this.validTitle = null;
     },
   },
 };
 </script>
 
 <style>
-.modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: table;
-  transition: opacity 0.3s ease;
-}
-
-.modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
-}
-
 .modal-enter-from {
   opacity: 0;
 }
