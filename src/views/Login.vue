@@ -98,7 +98,6 @@ export default {
           if (response.status === 200) {
             if (response.data.token) {
               localStorage.setItem("token", JSON.stringify(response.data));
-              this.isLoading = false;
             }
             this.logIn();
             setTimeout(() => this.$router.push({ name: "todolist" }), 700);
